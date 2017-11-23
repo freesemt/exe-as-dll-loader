@@ -21,6 +21,7 @@ public:
 	Ep_Object(PyObject* v);
 	Ep_Object(const char* cstr);
 	Ep_Object(const int int_value);
+	Ep_Object(const double float_value);
 	PyObject* get();
 };
 

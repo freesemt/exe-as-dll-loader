@@ -63,6 +63,11 @@ Ep_Object::Ep_Object(const int int_value)
 	value = PyLong_FromLong(int_value);
 }
 
+Ep_Object::Ep_Object(const double float_value)
+{
+	value = PyFloat_FromDouble(float_value);
+}
+
 PyObject* Ep_Object::get()
 {
 	return value;

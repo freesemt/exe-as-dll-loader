@@ -11,8 +11,14 @@ int test_2()
 	Ep_Object one( 1 );
 	Ep_Object two( 2 );
 
-	Ep_Object result = add(one, two);
-	cout << result << "\n";
+	Ep_Object int_result = add(one, two);
+	cout << int_result << "\n";
+
+	Ep_Object pi(3.14);
+	Ep_Object e(2.72);
+
+	Ep_Object float_result = add(pi, e);
+	cout << float_result << "\n";
 
 	return 0;
 }

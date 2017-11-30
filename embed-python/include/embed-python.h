@@ -1,3 +1,4 @@
+#include <iostream>
 #pragma once
 #ifdef EMBEDPYTHONLIB_EXPORTS
 #define EMBEDPYTHONLIB_API __declspec(dllexport)
@@ -19,15 +20,19 @@ public:
 	Ep_Object();
 	Ep_Object(PyObject* v);
 	Ep_Object(const char* cstr);
+	Ep_Object(const int int_value);
+	Ep_Object(const double float_value);
 	PyObject* get();
 };
+
+EMBEDPYTHONLIB_API std::ostream& operator<<(std::ostream& os, Ep_Object ep_obj);
 
 class EMBEDPYTHONLIB_API Ep_Function
 {
 private:
 	PyObject* function;
 	Ep_Object call();
-	Ep_Object call(Ep_Object& arg1, ...);
+	Ep_Object call(Ep_Object* arg1, ...);
 public:
 	Ep_Function();
 	Ep_Function(PyObject* f);

@@ -1,21 +1,47 @@
 #include <iostream>
-#pragma once
+
 #ifdef EMBEDPYTHONLIB_EXPORTS
 #define EMBEDPYTHONLIB_API __declspec(dllexport)
 #else
 #define EMBEDPYTHONLIB_API __declspec(dllimport)
-struct PyObject;
+struct _object;
+typedef _object PyObject;
 #endif
 
+/*
+ *	C interface
+ */
+typedef PyObject* EpC_Object;
+typedef PyObject* EpC_Function;
+
+EMBEDPYTHONLIB_API void EpC_Initialize(void);
+EMBEDPYTHONLIB_API int EpC_Finalize(void);
+EMBEDPYTHONLIB_API void EpC_AddSysPath(const char* path);
+EMBEDPYTHONLIB_API EpC_Object EpC_FromImport(const char* package, const char* function);
+
+EMBEDPYTHONLIB_API EpC_Object EpC_CoString(const char* cstr);
+EMBEDPYTHONLIB_API EpC_Object EpC_CoInt(const int int_value);
+EMBEDPYTHONLIB_API EpC_Object EpC_CoFloat(const double float_value);
+
+EMBEDPYTHONLIB_API const char* EpC_AsChar(EpC_Object object);
+EMBEDPYTHONLIB_API int EpC_AsInt(EpC_Object object);
+EMBEDPYTHONLIB_API double EpC_AsDouble(EpC_Object object);
+
+EMBEDPYTHONLIB_API EpC_Object EpC_CallS(EpC_Function func, EpC_Object arg1, ...);
+EMBEDPYTHONLIB_API EpC_Object EpC_CallN(EpC_Function func, const int n, EpC_Object* args);
+EMBEDPYTHONLIB_API void EpC_Print(EpC_Object arg1, ...);
+
+/*
+ *	C++ interface
+ */
 EMBEDPYTHONLIB_API void Ep_Initialize(void);
 EMBEDPYTHONLIB_API int Ep_Finalize(void);
-
 EMBEDPYTHONLIB_API void Ep_AddSysPath(const char* path);
 
 class EMBEDPYTHONLIB_API Ep_Object
 {
 private:
-	PyObject* value;
+	PyObject* object;
 public:
 	Ep_Object();
 	Ep_Object(PyObject* v);

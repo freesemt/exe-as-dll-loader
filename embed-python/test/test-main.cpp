@@ -1,17 +1,20 @@
 #include <embed-python.h>
 #include "test-1.h"
 #include "test-2.h"
+#include "test-3.h"
 
 int main()
 {
-	Ep_Initialize();
+	EpC_Initialize();
 
 	// note that cwd is 'embed-python-test'
-	Ep_AddSysPath("..\\..\\..\\scripts");
+	EpC_AddSysPath("..\\..\\..\\scripts");
 
 	test_1();
 	test_2();
+	test_3_C_InterfaceStopper();
+	test_3_C_InterfaceNumArgs();
 
-	Ep_Finalize();
+	EpC_Finalize();
 	return 0;
 }

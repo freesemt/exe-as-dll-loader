@@ -13,7 +13,7 @@ int test_3_C_InterfaceStopper()
 	EpC_CallS( hello, name, 0);
 
 	EpC_Function add = EpC_FromImport( "arithmetic", "add" );
-    EpC_Object one = EpC_CoInt( 1 );
+	EpC_Object one = EpC_CoInt( 1 );
 	EpC_Object two = EpC_CoInt( 2 );
 
 	EpC_Object int_result = EpC_CallS(add, one, two, 0);

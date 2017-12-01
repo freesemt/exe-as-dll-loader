@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "embed-python-test-cs", "emb
 		{1496B064-0EF4-4F10-87FC-03D99402B523} = {1496B064-0EF4-4F10-87FC-03D99402B523}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pythonnet-test-cs", "pythonnet-test-cs\pythonnet-test-cs.csproj", "{E3BC3734-E37C-42A3-AA46-B637D721F743}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +59,18 @@ Global
 		{6BF0D98B-6035-43E5-A7F4-E2FA9A18008D}.Release|x64.Build.0 = Release|Any CPU
 		{6BF0D98B-6035-43E5-A7F4-E2FA9A18008D}.Release|x86.ActiveCfg = Release|Any CPU
 		{6BF0D98B-6035-43E5-A7F4-E2FA9A18008D}.Release|x86.Build.0 = Release|Any CPU
+		{E3BC3734-E37C-42A3-AA46-B637D721F743}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E3BC3734-E37C-42A3-AA46-B637D721F743}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E3BC3734-E37C-42A3-AA46-B637D721F743}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E3BC3734-E37C-42A3-AA46-B637D721F743}.Debug|x64.Build.0 = Debug|Any CPU
+		{E3BC3734-E37C-42A3-AA46-B637D721F743}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E3BC3734-E37C-42A3-AA46-B637D721F743}.Debug|x86.Build.0 = Debug|Any CPU
+		{E3BC3734-E37C-42A3-AA46-B637D721F743}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E3BC3734-E37C-42A3-AA46-B637D721F743}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E3BC3734-E37C-42A3-AA46-B637D721F743}.Release|x64.ActiveCfg = Release|Any CPU
+		{E3BC3734-E37C-42A3-AA46-B637D721F743}.Release|x64.Build.0 = Release|Any CPU
+		{E3BC3734-E37C-42A3-AA46-B637D721F743}.Release|x86.ActiveCfg = Release|Any CPU
+		{E3BC3734-E37C-42A3-AA46-B637D721F743}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -31,28 +31,6 @@ namespace EmbPython
         [DllImport("embed-python-lib.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "?EpC_AsChar@@YAPEBDPEAU_object@@@Z")]
         private extern static IntPtr EpC_AsChar(IntPtr pyobj);
 
-        /*
-         * borrowed from
-         * https://stackoverflow.com/questions/44233214/expression-lambda-with-dynamic-input-parameters
-         */
-        public static Func<T[], T> CreateLambda<T>(int num)
-        {
-            var parameter = Expression.Parameter(typeof(T[]), "p");
-
-            // We sum all the parameters together
-            Expression sum = Expression.ArrayIndex(parameter, Expression.Constant(0));
-
-            for (int i = 1; i < num; i++)
-            {
-                sum = Expression.Add(sum, Expression.ArrayIndex(parameter, Expression.Constant(i)));
-            }
-
-            Expression body = sum;
-
-            var exp = Expression.Lambda<Func<T[], T>>(body, parameter);
-            return exp.Compile();
-        }
-
         public class Context : System.IDisposable
         {
             public Context()
@@ -97,7 +75,7 @@ namespace EmbPython
             public Object(String arg)
             {
             }
-            public String ToString()
+            public override String ToString()
             {
                 return Marshal.PtrToStringAnsi(EpC_AsChar(pyobject));
             }

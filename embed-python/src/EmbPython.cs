@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Linq.Expressions;
+using System.Dynamic;
 
 namespace EmbPython
 {
@@ -16,6 +16,10 @@ namespace EmbPython
 
         [DllImport("embed-python-lib.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "?EpC_FromImport@@YAPEAU_object@@PEBD0@Z")]
         private extern static IntPtr EpC_FromImport(char[] package, char[] function);
+        [DllImport("embed-python-lib.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "?EpC_Import@@YAPEAU_object@@PEBD@Z")]
+        private extern static IntPtr EpC_Import(char[] package);
+        [DllImport("embed-python-lib.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "?EpC_GetMethod@@YAPEAU_object@@PEAU1@PEBD@Z")]
+        private extern static IntPtr EpC_GetMethod(IntPtr module, char[] method);
 
         [DllImport("embed-python-lib.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "?EpC_CoString@@YAPEAU_object@@PEBD@Z")]
         private extern static IntPtr EpC_CoString(char[] path);
@@ -23,7 +27,10 @@ namespace EmbPython
         private extern static IntPtr EpC_CoInt(int int_value);
         [DllImport("embed-python-lib.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "?EpC_CoFloat@@YAPEAU_object@@N@Z")]
         private extern static IntPtr EpC_CoFloat(double double_value);
-
+        [DllImport("embed-python-lib.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "?EpC_CoList@@YAPEAU_object@@H@Z")]
+        private extern static IntPtr EpC_CoList(int num_items);
+        [DllImport("embed-python-lib.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "?EpC_List_SetItem@@YAHPEAU_object@@H0@Z")]
+        private extern static IntPtr EpC_List_SetItem(IntPtr list,int index, IntPtr item);
 
         [DllImport("embed-python-lib.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "?EpC_CallN@@YAPEAU_object@@PEAU1@HPEAPEAU1@@Z")]
         private extern static IntPtr EpC_CallN(IntPtr function, int n, IntPtr[] args);
@@ -66,7 +73,7 @@ namespace EmbPython
             private IntPtr pyobject;
             public Object()
             {
-
+                pyobject = (IntPtr)0;
             }
             public Object( IntPtr object_ptr )
             {
@@ -81,22 +88,8 @@ namespace EmbPython
             }
         }
 
-        public class Module
-        {
-            public Object array(List<double> list)
-            {
-                return new Object();
-            }
-        }
 
-        public static Module Import(String module_name)
-        {
-            return new Module();
-        }
-
-        public delegate Object VariableArgsFunction(params dynamic[] arguments);
-
-        public class Function
+        public class Function : DynamicObject
         {
             private IntPtr pyobject;
 
@@ -131,6 +124,17 @@ namespace EmbPython
                         // Console.Write("EpC_CoString\n");
                         arg_ptr_list[i] = EpC_CoString(arg.ToCharArray());
                     }
+                    else if (type == "System.Collections.Generic.List`1[System.Double]")
+                    {
+                        // Console.Write("List.Count={0}\n", arg.Count);
+                        IntPtr list_ = EpC_CoList(arg.Count);
+                        for ( int j =0; j < arg.Count; ++j )
+                        {
+                            IntPtr f = EpC_CoFloat(Convert.ToDouble(arg[j]));
+                            EpC_List_SetItem(list_, j, f);
+                        }
+                        arg_ptr_list[i] = list_;
+                    }
                     else
                     {
                         Console.Write("Unsupported type: {0}\n", type);
@@ -141,6 +145,46 @@ namespace EmbPython
 
                 return new Object(result);
             }
+
+            public override bool TryInvoke(
+                InvokeBinder binder, object[] args, out object result)
+            {
+                result = call(args);
+                return true;
+            }
+        }
+
+        public delegate Object VariableArgsFunction(params dynamic[] arguments);
+
+        public class Module : DynamicObject
+        {
+            private IntPtr pyobject;
+            public Module()
+            {
+                pyobject = (IntPtr)0;
+            }
+            public Module(IntPtr object_ptr)
+            {
+                pyobject = object_ptr;
+            }
+            public override bool TryGetMember(
+                  GetMemberBinder binder, out object result)
+            {
+                string name = binder.Name;
+                Console.WriteLine("TryGetMember: " + name);
+
+                IntPtr method_ptr = EpC_GetMethod(pyobject, name.ToCharArray());
+                Function f = new Function(method_ptr);
+
+                result = f;
+                return true;
+            }
+        }
+
+        public static Module Import(String module_name)
+        {
+            IntPtr module_ptr = EpC_Import(module_name.ToCharArray());
+            return new Module(module_ptr);
         }
 
         public static VariableArgsFunction FromImport(String module_name, String func_name)

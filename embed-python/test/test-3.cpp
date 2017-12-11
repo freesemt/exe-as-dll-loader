@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <embed-python.h>
 #include "test-3.h"
-using std::cout;
 
 int test_3_C_InterfaceStopper()
 {

@@ -33,7 +33,7 @@ EMBEDPYTHONLIB_API void EpC_AddSysPath(const char* path)
 	Ep_AddSysPath(path);
 }
 
-EMBEDPYTHONLIB_API EpC_Object EpC_FromImport(const char* c_pname, const char* c_funcname)
+EMBEDPYTHONLIB_API EpC_Function EpC_FromImport(const char* c_pname, const char* c_funcname)
 {
 	PyObject* pname = PyUnicode_DecodeFSDefault(c_pname);
 	PyObject* package = PyImport_Import(pname);
@@ -55,10 +55,42 @@ EMBEDPYTHONLIB_API EpC_Object EpC_FromImport(const char* c_pname, const char* c_
 		}
 		cerr << "Cannot find function '" << c_funcname << "'\n";
 	}
-	Py_XDECREF(function);
+	// Py_XDECREF(function);
 	Py_DECREF(package);
 
 	return function;
+}
+
+EMBEDPYTHONLIB_API EpC_Module EpC_Import(const char* c_pname)
+{
+	PyObject* pname = PyUnicode_DecodeFSDefault(c_pname);
+	PyObject* package = PyImport_Import(pname);
+	Py_DECREF(pname);
+
+	if (package == NULL)
+	{
+		PyErr_Print();
+		cerr << "Failed to load '" << c_pname << "'\n";
+		return 0;
+	}
+	return package;
+}
+
+EMBEDPYTHONLIB_API EpC_Function EpC_GetMethod(EpC_Module module, const char* c_pname)
+{
+	PyObject* method = PyObject_GetAttrString(module, c_pname);
+	if (method == 0 || !PyCallable_Check(method))
+	{
+		if (PyErr_Occurred())
+		{
+			PyErr_Print();
+		}
+		cerr << "Cannot find method '" << c_pname << "'\n";
+	}
+	// Py_XDECREF(method);
+	// Py_DECREF(module);
+
+	return method;
 }
 
 EMBEDPYTHONLIB_API EpC_Object EpC_CoString(const char* cstr)
@@ -74,6 +106,16 @@ EMBEDPYTHONLIB_API EpC_Object EpC_CoInt(const int int_value)
 EMBEDPYTHONLIB_API EpC_Object EpC_CoFloat(const double float_value)
 {
 	return PyFloat_FromDouble(float_value);
+}
+
+EMBEDPYTHONLIB_API EpC_Object EpC_CoList(const int num_items)
+{
+	return PyList_New(num_items);
+}
+
+EMBEDPYTHONLIB_API int  EpC_List_SetItem(EpC_Object list, int index, EpC_Object item)
+{
+	return PyList_SetItem( list, index, item);
 }
 
 EMBEDPYTHONLIB_API const char* EpC_AsChar(EpC_Object object)

@@ -1,0 +1,5 @@
+F:\Private\Github\exe-as-dll-loader\embed-python\vs-project\embpython-lib\bin\Release\EmbPython.dll
+F:\Private\Github\exe-as-dll-loader\embed-python\vs-project\embpython-lib\bin\Release\EmbPython.pdb
+F:\Private\Github\exe-as-dll-loader\embed-python\vs-project\embpython-lib\obj\Release\EmbPython.dll
+F:\Private\Github\exe-as-dll-loader\embed-python\vs-project\embpython-lib\obj\Release\EmbPython.pdb
+F:\Private\Github\exe-as-dll-loader\embed-python\vs-project\embpython-lib\obj\Release\embpython-lib.csprojResolveAssemblyReference.cache

@@ -5,7 +5,6 @@
 #include <sstream>
 #include <vector>
 #include <stdarg.h>
-#include <Python.h>
 #include <embed-python.h>
 
 using std::cout;
@@ -106,6 +105,11 @@ EMBEDPYTHONLIB_API EpC_Object EpC_CoInt(const int int_value)
 EMBEDPYTHONLIB_API EpC_Object EpC_CoFloat(const double float_value)
 {
 	return PyFloat_FromDouble(float_value);
+}
+
+EMBEDPYTHONLIB_API EpC_Object EpC_CoNone()
+{
+	return Py_None;
 }
 
 EMBEDPYTHONLIB_API EpC_Object EpC_CoList(const int num_items)

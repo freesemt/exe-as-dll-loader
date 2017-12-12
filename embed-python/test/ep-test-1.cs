@@ -40,8 +40,12 @@ namespace embpython_test
         {
             Console.Write("TestNumpy\n");
             dynamic np = Ep.Import("numpy");
-            dynamic a = np.array(new List<double>{ 1, 2, 3 });      
+            dynamic a = np.array(new List<double>{ 1, 2, 3 });
+            dynamic b = np.array(new List<double>{ 4, 5, 6 });
             Console.WriteLine(a.ToString());
+            Console.WriteLine(b.ToString());
+            Console.WriteLine(np.sum(a).ToString());
+            Console.WriteLine((a*b).ToString());
         }
 
         static void Main(string[] args)

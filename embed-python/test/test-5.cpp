@@ -22,5 +22,8 @@ int test_5()
 	EpC_Object nd_array = EpC_CallN(array, 1, args);
 	EpC_Print( nd_array, 0 );
 
+	EpC_Print( Py_None, 0);
+	EpC_Print( EpC_CoNone(), 0);
+
 	return 0;
 }

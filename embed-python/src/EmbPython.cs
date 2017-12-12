@@ -27,6 +27,8 @@ namespace EmbPython
         private extern static IntPtr EpC_CoInt(int int_value);
         [DllImport("embed-python-lib.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "?EpC_CoFloat@@YAPEAU_object@@N@Z")]
         private extern static IntPtr EpC_CoFloat(double double_value);
+        [DllImport("embed-python-lib.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "?EpC_CoNone@@YAPEAU_object@@XZ")]
+        private extern static IntPtr EpC_CoNone();
         [DllImport("embed-python-lib.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "?EpC_CoList@@YAPEAU_object@@H@Z")]
         private extern static IntPtr EpC_CoList(int num_items);
         [DllImport("embed-python-lib.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "?EpC_List_SetItem@@YAHPEAU_object@@H0@Z")]
@@ -86,6 +88,11 @@ namespace EmbPython
             {
                 return Marshal.PtrToStringAnsi(EpC_AsChar(pyobject));
             }
+            public static Object operator *(Object lhs, Object rhs)
+            {
+
+                return new Object( EpC_CoNone());
+            }
         }
 
 
@@ -124,6 +131,11 @@ namespace EmbPython
                         // Console.Write("EpC_CoString\n");
                         arg_ptr_list[i] = EpC_CoString(arg.ToCharArray());
                     }
+                    else if (type == "EmbPython.Ep+Object")
+                    {
+                        arg_ptr_list[i] = EpC_CoString(arg.ToCharArray());
+                    }
+
                     else if (type == "System.Collections.Generic.List`1[System.Double]")
                     {
                         // Console.Write("List.Count={0}\n", arg.Count);

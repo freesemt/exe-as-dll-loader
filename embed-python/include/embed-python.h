@@ -20,7 +20,8 @@ EMBEDPYTHONLIB_API int EpC_Finalize(void);
 EMBEDPYTHONLIB_API void EpC_AddSysPath(const char* path);
 EMBEDPYTHONLIB_API EpC_Function EpC_FromImport(const char* package, const char* function);
 EMBEDPYTHONLIB_API EpC_Module EpC_Import(const char* package);
-EMBEDPYTHONLIB_API EpC_Object EpC_GetMethod(EpC_Object module, const char* name);
+EMBEDPYTHONLIB_API EpC_Function EpC_GetMethod(EpC_Module module, const char* name);
+EMBEDPYTHONLIB_API EpC_Object EpC_GetAttrString(EpC_Object object, const char* name);
 
 EMBEDPYTHONLIB_API EpC_Object EpC_CoString(const char* cstr);
 EMBEDPYTHONLIB_API EpC_Object EpC_CoInt(const int int_value);
@@ -28,7 +29,8 @@ EMBEDPYTHONLIB_API EpC_Object EpC_CoFloat(const double float_value);
 EMBEDPYTHONLIB_API EpC_Object EpC_CoNone();
 EMBEDPYTHONLIB_API EpC_Object EpC_CoList(const int num_items);
 EMBEDPYTHONLIB_API int EpC_List_SetItem(EpC_Object list, int index, EpC_Object item);
-
+EMBEDPYTHONLIB_API EpC_Object EpC_CoDict();
+EMBEDPYTHONLIB_API int EpC_Dict_SetItemString(EpC_Object dict, const char* key, EpC_Object value);
 
 EMBEDPYTHONLIB_API const char* EpC_AsChar(EpC_Object object);
 EMBEDPYTHONLIB_API int EpC_AsInt(EpC_Object object);
@@ -36,7 +38,10 @@ EMBEDPYTHONLIB_API double EpC_AsDouble(EpC_Object object);
 
 EMBEDPYTHONLIB_API EpC_Object EpC_CallS(EpC_Function func, EpC_Object arg1, ...);
 EMBEDPYTHONLIB_API EpC_Object EpC_CallN(EpC_Function func, const int n, EpC_Object* args);
+EMBEDPYTHONLIB_API EpC_Object EpC_CallK(EpC_Function func, const int n, EpC_Object* args, EpC_Object kwargs);
 EMBEDPYTHONLIB_API void EpC_Print(EpC_Object arg1, ...);
+
+EMBEDPYTHONLIB_API const char* EpC_TypeAsChar(EpC_Object object);
 
 /*
  *	C++ interface

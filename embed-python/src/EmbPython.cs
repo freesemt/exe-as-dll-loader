@@ -33,9 +33,15 @@ namespace EmbPython
         private extern static IntPtr EpC_CoList(int num_items);
         [DllImport("embed-python-lib.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "?EpC_List_SetItem@@YAHPEAU_object@@H0@Z")]
         private extern static IntPtr EpC_List_SetItem(IntPtr list,int index, IntPtr item);
+        [DllImport("embed-python-lib.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "?EpC_CoDict@@YAPEAU_object@@XZ")]
+        private extern static IntPtr EpC_CoDict();
+        [DllImport("embed-python-lib.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "?EpC_Dict_SetItemString@@YAHPEAU_object@@PEBD0@Z")]
+        private extern static IntPtr EpC_Dict_SetItemString(IntPtr dict, char[] key, IntPtr val);
 
         [DllImport("embed-python-lib.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "?EpC_CallN@@YAPEAU_object@@PEAU1@HPEAPEAU1@@Z")]
         private extern static IntPtr EpC_CallN(IntPtr function, int n, IntPtr[] args);
+        [DllImport("embed-python-lib.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "?EpC_CallK@@YAPEAU_object@@PEAU1@HPEAPEAU1@0@Z")]
+        private extern static IntPtr EpC_CallK(IntPtr function, int n, IntPtr[] args, IntPtr kwargs);
 
         [DllImport("embed-python-lib.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "?EpC_AsChar@@YAPEBDPEAU_object@@@Z")]
         private extern static IntPtr EpC_AsChar(IntPtr pyobj);
@@ -70,6 +76,63 @@ namespace EmbPython
             EpC_AddSysPath(path.ToCharArray());
         }
 
+        public static int dynamicToEpObject( dynamic arg, out IntPtr ret_value )
+        {
+            string type = arg.GetType().ToString();
+            int ref_flag = 0;
+            // Console.Write(type + "\n");
+            if (type == "System.Double")
+            {
+                // Console.Write("EpC_CoFloat\n");
+                ret_value = EpC_CoFloat(Convert.ToDouble(arg));
+            }
+            else if (type == "System.Int32")
+            {
+                // Console.Write("EpC_CoInt\n");
+                ret_value = EpC_CoInt(Convert.ToInt32(arg));
+            }
+            else if (type == "System.String")
+            {
+                // Console.Write("EpC_CoString\n");
+                ret_value = EpC_CoString(arg.ToCharArray());
+            }
+            else if (type == "EmbPython.Ep+Object")
+            {
+                ret_value = arg.getPyObject(); ;
+            }
+            else if (type == "System.Collections.Generic.Dictionary`2[System.String,System.Object]")
+            {
+                IntPtr dict = EpC_CoDict();
+                foreach (KeyValuePair<string, dynamic> pair in arg)
+                {
+                    //  Console.WriteLine(string.Format("Key : {0} / Value : {1}", pair.Key, pair.Value));
+                    IntPtr dict_val;
+                    dynamicToEpObject(pair.Value, out dict_val);
+                    EpC_Dict_SetItemString(dict, pair.Key.ToCharArray(), dict_val);
+                }
+                ret_value = dict;
+                ref_flag = 1;
+            }
+            else if (type == "System.Collections.Generic.List`1[System.Double]")
+            {
+                // Console.Write("List.Count={0}\n", arg.Count);
+                IntPtr list_ = EpC_CoList(arg.Count);
+                for (int j = 0; j < arg.Count; ++j)
+                {
+                    IntPtr f = EpC_CoFloat(Convert.ToDouble(arg[j]));
+                    EpC_List_SetItem(list_, j, f);
+                }
+                ret_value = list_;
+            }
+            else
+            {
+                Console.Write("Unsupported type: {0}\n", type);
+                ret_value = EpC_CoNone();
+            }
+
+            return ref_flag;
+        }
+
         public class Object
         {
             private IntPtr pyobject;
@@ -87,6 +150,10 @@ namespace EmbPython
             public override String ToString()
             {
                 return Marshal.PtrToStringAnsi(EpC_AsChar(pyobject));
+            }
+            public IntPtr getPyObject()
+            {
+                return pyobject;
             }
             public static Object operator *(Object lhs, Object rhs)
             {
@@ -108,52 +175,29 @@ namespace EmbPython
             public Object call(params dynamic[] args)
             {
                 // Console.WriteLine("Function.call");
+                IntPtr kwargs= EpC_CoDict(); ;
+                int kwargs_count = 0;
 
                 IntPtr[] arg_ptr_list = new IntPtr[args.Length];
                 for (int i = 0; i < args.Length; i++)
                 {
                     dynamic arg = args[i];
                     // Console.Write(arg + "\n");
-                    string type = arg.GetType().ToString();
-                    // Console.Write(type + "\n");
-                    if (type == "System.Double")
+                    IntPtr ret_value;
+                    int ret_flag = dynamicToEpObject( arg, out ret_value );
+                    if ( ret_flag == 0 )
                     {
-                        // Console.Write("EpC_CoFloat\n");
-                        arg_ptr_list[i] = EpC_CoFloat(Convert.ToDouble(arg));
-                    }
-                    else if (type == "System.Int32")
-                    {
-                        // Console.Write("EpC_CoInt\n");
-                        arg_ptr_list[i] = EpC_CoInt(Convert.ToInt32(arg));
-                    }
-                    else if (type == "System.String")
-                    {
-                        // Console.Write("EpC_CoString\n");
-                        arg_ptr_list[i] = EpC_CoString(arg.ToCharArray());
-                    }
-                    else if (type == "EmbPython.Ep+Object")
-                    {
-                        arg_ptr_list[i] = EpC_CoString(arg.ToCharArray());
-                    }
-
-                    else if (type == "System.Collections.Generic.List`1[System.Double]")
-                    {
-                        // Console.Write("List.Count={0}\n", arg.Count);
-                        IntPtr list_ = EpC_CoList(arg.Count);
-                        for ( int j =0; j < arg.Count; ++j )
-                        {
-                            IntPtr f = EpC_CoFloat(Convert.ToDouble(arg[j]));
-                            EpC_List_SetItem(list_, j, f);
-                        }
-                        arg_ptr_list[i] = list_;
+                        arg_ptr_list[i] = ret_value;
                     }
                     else
                     {
-                        Console.Write("Unsupported type: {0}\n", type);
+                        kwargs = ret_value;
+                        kwargs_count++;
                     }
                 }
 
-                IntPtr result = EpC_CallN(pyobject, args.Length, arg_ptr_list);
+                // IntPtr result = EpC_CallN(pyobject, args.Length, arg_ptr_list);
+                IntPtr result = EpC_CallK(pyobject, args.Length- kwargs_count, arg_ptr_list, kwargs);
 
                 return new Object(result);
             }

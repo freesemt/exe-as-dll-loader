@@ -36,6 +36,16 @@ namespace embpython_test
             Console.Write("float_value={0}\n", float_value.ToString());
         }
 
+        static void TestKwArgs()
+        {
+            dynamic increment = Ep.FromImport("kwargs_test", "increment");
+            dynamic ret_val_1 = increment( 2 );
+            Console.Write("ret_val_1={0}\n", ret_val_1.ToString());
+            dynamic inc_10 = new Dictionary<string, dynamic>() { { "inc", 10 } };
+            dynamic ret_val_2 = increment(2, inc_10);
+            Console.Write("ret_val_2={0}\n", ret_val_2.ToString());
+        }
+
         static void TestNumpy()
         {
             Console.Write("TestNumpy\n");
@@ -55,6 +65,7 @@ namespace embpython_test
 
             TestBasicsFromImport();
             TestBasicsGenericImport();
+            TestKwArgs();
             TestNumpy();
 
             Ep.Finalize();

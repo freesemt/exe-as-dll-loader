@@ -75,21 +75,38 @@ EMBEDPYTHONLIB_API EpC_Module EpC_Import(const char* c_pname)
 	return package;
 }
 
-EMBEDPYTHONLIB_API EpC_Function EpC_GetMethod(EpC_Module module, const char* c_pname)
+EMBEDPYTHONLIB_API EpC_Function EpC_GetMethod(EpC_Module module, const char* name)
 {
-	PyObject* method = PyObject_GetAttrString(module, c_pname);
+	PyObject* method = PyObject_GetAttrString(module, name);
 	if (method == 0 || !PyCallable_Check(method))
 	{
 		if (PyErr_Occurred())
 		{
 			PyErr_Print();
 		}
-		cerr << "Cannot find method '" << c_pname << "'\n";
+		cerr << "Cannot find method '" << name << "'\n";
 	}
 	// Py_XDECREF(method);
 	// Py_DECREF(module);
 
 	return method;
+}
+
+EMBEDPYTHONLIB_API EpC_Object EpC_GetAttrString(EpC_Object object, const char* name)
+{
+	PyObject* attr = PyObject_GetAttrString(object, name);
+	if (attr == 0)
+	{
+		if (PyErr_Occurred())
+		{
+			PyErr_Print();
+		}
+		cerr << "Cannot find attr '" << name << "'\n";
+	}
+	// Py_XDECREF(method);
+	// Py_DECREF(module);
+
+	return attr;
 }
 
 EMBEDPYTHONLIB_API EpC_Object EpC_CoString(const char* cstr)
@@ -120,6 +137,16 @@ EMBEDPYTHONLIB_API EpC_Object EpC_CoList(const int num_items)
 EMBEDPYTHONLIB_API int  EpC_List_SetItem(EpC_Object list, int index, EpC_Object item)
 {
 	return PyList_SetItem( list, index, item);
+}
+
+EMBEDPYTHONLIB_API EpC_Object EpC_CoDict()
+{
+	return PyDict_New();
+}
+
+EMBEDPYTHONLIB_API int EpC_Dict_SetItemString(EpC_Object dict, const char* key, EpC_Object val)
+{
+	return PyDict_SetItemString(dict, key, val);
 }
 
 EMBEDPYTHONLIB_API const char* EpC_AsChar(EpC_Object object)
@@ -177,11 +204,13 @@ EMBEDPYTHONLIB_API EpC_Object EpC_CallS(EpC_Function func, EpC_Object arg1, ...)
 	}
 
 	PyObject* ret_value = PyObject_CallObject(func, pargs);
+	Py_DECREF(pargs);
 	return ret_value;
 }
 
 EMBEDPYTHONLIB_API EpC_Object EpC_CallN(EpC_Function func, const int num_args, EpC_Object* args )
 {
+	// printf( "num_args=%d", num_args);
 	PyObject* pargs = PyTuple_New(num_args);
 
 	for (int i = 0; i < num_args; ++i)
@@ -190,6 +219,21 @@ EMBEDPYTHONLIB_API EpC_Object EpC_CallN(EpC_Function func, const int num_args, E
 	}
 
 	PyObject* ret_value = PyObject_CallObject(func, pargs);
+	Py_DECREF(pargs);
+	return ret_value;
+}
+
+EMBEDPYTHONLIB_API EpC_Object EpC_CallK(EpC_Function func, const int num_args, EpC_Object* args, EpC_Object kwargs)
+{
+	PyObject* pargs = PyTuple_New(num_args);
+
+	for (int i = 0; i < num_args; ++i)
+	{
+		PyTuple_SetItem(pargs, i, args[i]);
+	}
+
+	PyObject* ret_value = PyObject_Call(func, pargs, kwargs);
+	Py_DECREF(pargs);
 	return ret_value;
 }
 
@@ -214,6 +258,13 @@ EMBEDPYTHONLIB_API void EpC_Print(EpC_Object arg1, ...)
 	va_end(valist);
 
 	printf("\n");
+}
+
+EMBEDPYTHONLIB_API const char* EpC_TypeAsChar(EpC_Object object)
+{
+	PyTypeObject* ob_type = object->ob_type;
+	const char* tp_name = ob_type->tp_name;
+	return tp_name;
 }
 
 /*

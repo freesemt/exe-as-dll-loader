@@ -155,6 +155,8 @@
     <ClCompile Include="..\..\test\test-3.cpp" />
     <ClCompile Include="..\..\test\test-4.cpp" />
     <ClCompile Include="..\..\test\test-5.cpp" />
+    <ClCompile Include="..\..\test\test-6.cpp" />
+    <ClCompile Include="..\..\test\test-7.cpp" />
     <ClCompile Include="..\..\test\test-main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -163,6 +165,8 @@
     <ClInclude Include="..\..\test\test-3.h" />
     <ClInclude Include="..\..\test\test-4.h" />
     <ClInclude Include="..\..\test\test-5.h" />
+    <ClInclude Include="..\..\test\test-6.h" />
+    <ClInclude Include="..\..\test\test-7.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

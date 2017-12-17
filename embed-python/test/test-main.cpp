@@ -4,6 +4,8 @@
 #include "test-3.h"
 #include "test-4.h"
 #include "test-5.h"
+#include "test-6.h"
+#include "test-7.h"
 
 int main()
 {
@@ -18,6 +20,8 @@ int main()
 	test_3_C_InterfaceNumArgs();
 	test_4();
 	test_5();
+	test_6();
+	test_7();
 
 	EpC_Finalize();
 	return 0;

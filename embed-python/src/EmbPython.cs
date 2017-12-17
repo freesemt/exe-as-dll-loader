@@ -46,6 +46,8 @@ namespace EmbPython
         [DllImport("embed-python-lib.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "?EpC_AsChar@@YAPEBDPEAU_object@@@Z")]
         private extern static IntPtr EpC_AsChar(IntPtr pyobj);
 
+        const bool DEBUG = false;
+
         public class Context : System.IDisposable
         {
             public Context()
@@ -80,7 +82,8 @@ namespace EmbPython
         {
             string type = arg.GetType().ToString();
             int ref_flag = 0;
-            // Console.Write(type + "\n");
+            if (DEBUG) { Console.Write("type={0}\n", type); }
+
             if (type == "System.Double")
             {
                 // Console.Write("EpC_CoFloat\n");
@@ -113,6 +116,19 @@ namespace EmbPython
                 ret_value = dict;
                 ref_flag = 1;
             }
+            else if (type == "System.Collections.Generic.List`1[System.Object]")
+            {
+                // Console.Write("List.Count={0}\n", arg.Count);
+                IntPtr list_ = EpC_CoList(arg.Count);
+                for (int j = 0; j < arg.Count; ++j)
+                {
+                    IntPtr pobj;
+                    dynamicToEpObject(arg[j], out pobj);
+                    EpC_List_SetItem(list_, j, pobj);
+                }
+                ret_value = list_;
+                //Console.Write("List.ret_value={0}\n", new Object(list_).ToString());
+            }
             else if (type == "System.Collections.Generic.List`1[System.Double]")
             {
                 // Console.Write("List.Count={0}\n", arg.Count);
@@ -128,6 +144,11 @@ namespace EmbPython
             {
                 Console.Write("Unsupported type: {0}\n", type);
                 ret_value = EpC_CoNone();
+            }
+            if (DEBUG)
+            {
+                Console.Write("dynamicToEpObject: ret_value_ptr={0}\n", ret_value );
+                Console.Write("dynamicToEpObject: ret_value={0}\n", new Object(ret_value).ToString());
             }
 
             return ref_flag;
@@ -227,7 +248,7 @@ namespace EmbPython
                   GetMemberBinder binder, out object result)
             {
                 string name = binder.Name;
-                Console.WriteLine("TryGetMember: " + name);
+                // Console.WriteLine("TryGetMember: " + name);
 
                 IntPtr method_ptr = EpC_GetMethod(pyobject, name.ToCharArray());
                 Function f = new Function(method_ptr);

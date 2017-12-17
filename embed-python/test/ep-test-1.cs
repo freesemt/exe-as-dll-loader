@@ -54,8 +54,12 @@ namespace embpython_test
             dynamic b = np.array(new List<double>{ 4, 5, 6 });
             Console.WriteLine(a.ToString());
             Console.WriteLine(b.ToString());
-            Console.WriteLine(np.sum(a).ToString());
-            Console.WriteLine((a*b).ToString());
+            // dynamic s = np.sum(a);
+            // Console.WriteLine(s.ToString());
+            dynamic axis_0 = new Dictionary<string, dynamic>() { { "axis", 0 } };
+            dynamic p = np.prod(new List<dynamic> { a, b }, axis_0);
+            Console.WriteLine(p.ToString());
+            // Console.WriteLine((a*b).ToString());
         }
 
         static void Main(string[] args)

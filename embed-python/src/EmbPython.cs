@@ -177,6 +177,7 @@ namespace EmbPython
 
         public class Object
         {
+            private static dynamic np = new Module();
             private IntPtr pyobject;
             public Object()
             {
@@ -199,11 +200,13 @@ namespace EmbPython
             }
             public static Object operator *(Object lhs, Object rhs)
             {
-
-                return new Object( EpC_CoNone());
+                if (!np.isOk())
+                {
+                    np = Import("numpy");
+                }
+                return np.prod( new List<dynamic> {  lhs, rhs }, new { axis=0 } );
             }
         }
-
 
         public class Function : DynamicObject
         {
@@ -276,6 +279,10 @@ namespace EmbPython
 
                 result = f;
                 return true;
+            }
+            public bool isOk()
+            {
+                return pyobject != (IntPtr)0;
             }
         }
 

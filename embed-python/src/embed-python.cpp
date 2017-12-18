@@ -204,7 +204,7 @@ EMBEDPYTHONLIB_API EpC_Object EpC_CallS(EpC_Function func, EpC_Object arg1, ...)
 	}
 
 	PyObject* ret_value = PyObject_CallObject(func, pargs);
-	Py_DECREF(pargs);
+	// Py_DECREF(pargs);
 	return ret_value;
 }
 
@@ -219,7 +219,7 @@ EMBEDPYTHONLIB_API EpC_Object EpC_CallN(EpC_Function func, const int num_args, E
 	}
 
 	PyObject* ret_value = PyObject_CallObject(func, pargs);
-	Py_DECREF(pargs);
+	// Py_DECREF(pargs);
 	return ret_value;
 }
 
@@ -233,7 +233,7 @@ EMBEDPYTHONLIB_API EpC_Object EpC_CallK(EpC_Function func, const int num_args, E
 	}
 
 	PyObject* ret_value = PyObject_Call(func, pargs, kwargs);
-	Py_DECREF(pargs);
+	// Py_DECREF(pargs);
 	return ret_value;
 }
 

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Dynamic;
+using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace EmbPython
 {
@@ -80,7 +82,8 @@ namespace EmbPython
 
         public static int dynamicToEpObject( dynamic arg, out IntPtr ret_value )
         {
-            string type = arg.GetType().ToString();
+            Type type_ = arg.GetType();
+            string type = type_.ToString();
             int ref_flag = 0;
             if (DEBUG) { Console.Write("type={0}\n", type); }
 
@@ -102,6 +105,24 @@ namespace EmbPython
             else if (type == "EmbPython.Ep+Object")
             {
                 ret_value = arg.getPyObject(); ;
+            }
+            else if (type.IndexOf("<>f__AnonymousType") == 0)
+            {
+                // (type == "<>f__AnonymousType0`1[System.Int32]" || type == "<>f__AnonymousType1`1[System.Int32]")
+                IntPtr dict = EpC_CoDict();
+                PropertyInfo[] pi = type_.GetProperties();
+                foreach (PropertyInfo p in pi)
+                {
+                    //Get the name of the prperty
+                    string pname = p.Name;
+                    dynamic pvalue = p.GetValue(arg);
+                    // Console.WriteLine("Name={0}, Value={1}", pname, pvalue);
+                    IntPtr pobj;
+                    dynamicToEpObject(pvalue, out pobj);
+                    EpC_Dict_SetItemString(dict, p.Name.ToCharArray(), pobj);
+                }
+                ret_value = dict;
+                ref_flag = 1;
             }
             else if (type == "System.Collections.Generic.Dictionary`2[System.String,System.Object]")
             {

@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "embpython-test", "embpython
 		{0C50FA2D-2E69-4F59-A063-5E4EA3822660} = {0C50FA2D-2E69-4F59-A063-5E4EA3822660}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "delegate-with-named-arguments", "delegate-with-named-arguments\delegate-with-named-arguments.csproj", "{B1756588-58C1-4AE9-B898-ECB9C99629F6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -105,6 +107,18 @@ Global
 		{563AE557-454B-4958-8F42-6EB9252F6E6F}.Release|x64.Build.0 = Release|Any CPU
 		{563AE557-454B-4958-8F42-6EB9252F6E6F}.Release|x86.ActiveCfg = Release|Any CPU
 		{563AE557-454B-4958-8F42-6EB9252F6E6F}.Release|x86.Build.0 = Release|Any CPU
+		{B1756588-58C1-4AE9-B898-ECB9C99629F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1756588-58C1-4AE9-B898-ECB9C99629F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1756588-58C1-4AE9-B898-ECB9C99629F6}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B1756588-58C1-4AE9-B898-ECB9C99629F6}.Debug|x64.Build.0 = Debug|Any CPU
+		{B1756588-58C1-4AE9-B898-ECB9C99629F6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B1756588-58C1-4AE9-B898-ECB9C99629F6}.Debug|x86.Build.0 = Debug|Any CPU
+		{B1756588-58C1-4AE9-B898-ECB9C99629F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1756588-58C1-4AE9-B898-ECB9C99629F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1756588-58C1-4AE9-B898-ECB9C99629F6}.Release|x64.ActiveCfg = Release|Any CPU
+		{B1756588-58C1-4AE9-B898-ECB9C99629F6}.Release|x64.Build.0 = Release|Any CPU
+		{B1756588-58C1-4AE9-B898-ECB9C99629F6}.Release|x86.ActiveCfg = Release|Any CPU
+		{B1756588-58C1-4AE9-B898-ECB9C99629F6}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

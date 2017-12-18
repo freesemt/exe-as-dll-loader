@@ -41,8 +41,7 @@ namespace embpython_test
             dynamic increment = Ep.FromImport("kwargs_test", "increment");
             dynamic ret_val_1 = increment( 2 );
             Console.Write("ret_val_1={0}\n", ret_val_1.ToString());
-            dynamic inc_10 = new Dictionary<string, dynamic>() { { "inc", 10 } };
-            dynamic ret_val_2 = increment(2, inc_10);
+            dynamic ret_val_2 = increment(2, new { inc = 10 } );
             Console.Write("ret_val_2={0}\n", ret_val_2.ToString());
         }
 
@@ -56,8 +55,7 @@ namespace embpython_test
             Console.WriteLine(b.ToString());
             // dynamic s = np.sum(a);
             // Console.WriteLine(s.ToString());
-            dynamic axis_0 = new Dictionary<string, dynamic>() { { "axis", 0 } };
-            dynamic p = np.prod(new List<dynamic> { a, b }, axis_0);
+            dynamic p = np.prod(new List<dynamic> { a, b }, new { axis = 0 });
             Console.WriteLine(p.ToString());
             // Console.WriteLine((a*b).ToString());
         }

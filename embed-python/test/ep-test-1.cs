@@ -57,7 +57,7 @@ namespace embpython_test
             Console.WriteLine(s.ToString());
             dynamic p = np.prod(new List<dynamic> { a, b }, new { axis = 0 });
             Console.WriteLine(p.ToString());
-            // Console.WriteLine((a*b).ToString());
+            Console.WriteLine((a*b).ToString());
         }
 
         static void Main(string[] args)

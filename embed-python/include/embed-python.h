@@ -23,6 +23,8 @@ EMBEDPYTHONLIB_API EpC_Module EpC_Import(const char* package);
 EMBEDPYTHONLIB_API EpC_Function EpC_GetMethod(EpC_Module module, const char* name);
 EMBEDPYTHONLIB_API EpC_Object EpC_GetAttrString(EpC_Object object, const char* name);
 
+EMBEDPYTHONLIB_API void EpC_DECREF(EpC_Object object);
+
 EMBEDPYTHONLIB_API EpC_Object EpC_CoString(const char* cstr);
 EMBEDPYTHONLIB_API EpC_Object EpC_CoInt(const int int_value);
 EMBEDPYTHONLIB_API EpC_Object EpC_CoFloat(const double float_value);

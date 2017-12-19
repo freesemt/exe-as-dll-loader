@@ -110,6 +110,11 @@ EMBEDPYTHONLIB_API EpC_Object EpC_GetAttrString(EpC_Object object, const char* n
 	return attr;
 }
 
+EMBEDPYTHONLIB_API void EpC_DECREF(EpC_Object object)
+{
+	Py_DECREF(object);
+}
+
 EMBEDPYTHONLIB_API EpC_Object EpC_CoString(const char* cstr)
 {
 	return  PyUnicode_FromString(cstr);
@@ -188,6 +193,7 @@ EMBEDPYTHONLIB_API const char* EpC_AsChar(EpC_Object object)
 EMBEDPYTHONLIB_API const int EpC_NumpyInitialize()
 {
 	import_array();
+	return 0;
 }
 
 EMBEDPYTHONLIB_API const double* EpC_NumpyArrayAsDoubleArray(EpC_Object object, int depth)

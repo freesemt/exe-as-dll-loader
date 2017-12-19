@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{B1756588-58C1-4AE9-B898-ECB9C99629F6}</ProjectGuid>
+    <ProjectGuid>{4A34D271-67F5-49C0-98C3-10A9CAB0C836}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>delegate_with_named_arguments</RootNamespace>

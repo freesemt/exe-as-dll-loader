@@ -6,6 +6,7 @@
 #include <vector>
 #include <stdarg.h>
 #include <embed-python.h>
+#include <numpy/arrayobject.h>
 
 using std::cout;
 using std::cerr;
@@ -134,9 +135,29 @@ EMBEDPYTHONLIB_API EpC_Object EpC_CoList(const int num_items)
 	return PyList_New(num_items);
 }
 
-EMBEDPYTHONLIB_API int  EpC_List_SetItem(EpC_Object list, int index, EpC_Object item)
+EMBEDPYTHONLIB_API int EpC_List_SetItem(EpC_Object list, int index, EpC_Object item)
 {
 	return PyList_SetItem( list, index, item);
+}
+
+EMBEDPYTHONLIB_API EpC_Object EpC_List_GetItem(EpC_Object list, int index)
+{
+	return PyList_GetItem(list, index);
+}
+
+EMBEDPYTHONLIB_API EpC_Object EpC_CoTuple(const int num_items)
+{
+	return PyTuple_New(num_items);
+}
+
+EMBEDPYTHONLIB_API int EpC_Tuple_SetItem(EpC_Object tuple, int index, EpC_Object item)
+{
+	return PyTuple_SetItem(tuple, index, item);
+}
+
+EMBEDPYTHONLIB_API EpC_Object EpC_Tuple_GetItem(EpC_Object tuple, int index)
+{
+	return PyTuple_GetItem(tuple, index);
 }
 
 EMBEDPYTHONLIB_API EpC_Object EpC_CoDict()
@@ -162,6 +183,26 @@ EMBEDPYTHONLIB_API const char* EpC_AsChar(EpC_Object object)
 
 	// printf("DEBUG: bytes=%s\n", bytes);
 	return bytes;
+}
+
+EMBEDPYTHONLIB_API const int EpC_NumpyInitialize()
+{
+	import_array();
+}
+
+EMBEDPYTHONLIB_API const double* EpC_NumpyArrayAsDoubleArray(EpC_Object object, int depth)
+{
+	// printf("EpC_NumpyArrayAsDoubleArray: depth=%d\n", depth);
+
+	PyArrayObject* in_array = (PyArrayObject *)PyArray_ContiguousFromAny(object, PyArray_DOUBLE, depth, depth);
+	// printf("in_array=%p\n", in_array);
+	if (in_array == 0)
+		return 0;
+
+	NpyIter *in_iter = NpyIter_New(in_array, NPY_ITER_READONLY, NPY_KEEPORDER, NPY_NO_CASTING, NULL);
+	double ** in_dataptr = (double **)NpyIter_GetDataPtrArray(in_iter);
+	// printf("in_dataptr=%p\n", in_dataptr);
+	return *in_dataptr;
 }
 
 EMBEDPYTHONLIB_API int EpC_AsInt(EpC_Object object)

@@ -57,7 +57,22 @@ namespace embpython_test
             Console.WriteLine(s.ToString());
             dynamic p = np.prod(new List<dynamic> { a, b }, new { axis = 0 });
             Console.WriteLine(p.ToString());
+            Console.WriteLine(p.shape.ToString());
             Console.WriteLine((a*b).ToString());
+        }
+
+        static void TestFabio()
+        {
+            Console.Write("TestFabio\n");
+            dynamic fabio = Ep.Import("fabio");
+            dynamic image = fabio.open("..\\..\\..\\..\\..\\data\\min_data.tif");
+            Console.WriteLine(image.data.shape.ToString());
+            dynamic plt = Ep.Import("matplotlib.pyplot");
+            plt.imshow(image.data);
+            plt.show();
+            Ep.Image image_ = new Ep.Image(image.data);
+            Console.WriteLine(image_.shape().ToString());
+            Console.WriteLine(image_.ToString());
         }
 
         static void Main(string[] args)
@@ -69,6 +84,7 @@ namespace embpython_test
             TestBasicsGenericImport();
             TestKwArgs();
             TestNumpy();
+            TestFabio();
 
             Ep.Finalize();
         }

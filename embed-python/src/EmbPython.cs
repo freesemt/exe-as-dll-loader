@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Dynamic;
 using System.Reflection;
+using System.IO;
 using System.Text.RegularExpressions;
 
 namespace EmbPython
@@ -11,6 +12,8 @@ namespace EmbPython
     {
         [DllImport("embed-python-lib.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "?EpC_Initialize@@YAXXZ")]
         private extern static void EpC_Initialize();
+        [DllImport("embed-python-lib.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "?EpC_NumpyInitialize@@YA?BHXZ")]
+        private extern static int EpC_NumpyInitialize();
         [DllImport("embed-python-lib.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "?EpC_Finalize@@YAHXZ")]
         private extern static int EpC_Finalize();
         [DllImport("embed-python-lib.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "?EpC_AddSysPath@@YAXPEBD@Z")]
@@ -22,6 +25,8 @@ namespace EmbPython
         private extern static IntPtr EpC_Import(char[] package);
         [DllImport("embed-python-lib.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "?EpC_GetMethod@@YAPEAU_object@@PEAU1@PEBD@Z")]
         private extern static IntPtr EpC_GetMethod(IntPtr module, char[] method);
+        [DllImport("embed-python-lib.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "?EpC_GetAttrString@@YAPEAU_object@@PEAU1@PEBD@Z")]
+        private extern static IntPtr EpC_GetAttrString(IntPtr pyobj, char[] name);
 
         [DllImport("embed-python-lib.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "?EpC_CoString@@YAPEAU_object@@PEBD@Z")]
         private extern static IntPtr EpC_CoString(char[] path);
@@ -34,7 +39,16 @@ namespace EmbPython
         [DllImport("embed-python-lib.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "?EpC_CoList@@YAPEAU_object@@H@Z")]
         private extern static IntPtr EpC_CoList(int num_items);
         [DllImport("embed-python-lib.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "?EpC_List_SetItem@@YAHPEAU_object@@H0@Z")]
-        private extern static IntPtr EpC_List_SetItem(IntPtr list,int index, IntPtr item);
+        private extern static int EpC_List_SetItem(IntPtr list,int index, IntPtr item);
+        [DllImport("embed-python-lib.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "?EpC_List_GetItem@@YAPEAU_object@@PEAU1@H@Z")]
+        private extern static IntPtr EpC_List_GetItem(IntPtr list, int index);
+        [DllImport("embed-python-lib.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "?EpC_CoTuple@@YAPEAU_object@@H@Z")]
+        private extern static IntPtr EpC_CoTuple(int num_items);
+        [DllImport("embed-python-lib.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "?EpC_Tuple_SetItem@@YAHPEAU_object@@H0@Z")]
+        private extern static int EpC_Tuple_SetItem(IntPtr list, int index, IntPtr item);
+        [DllImport("embed-python-lib.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "?EpC_Tuple_GetItem@@YAPEAU_object@@PEAU1@H@Z")]
+        private extern static IntPtr EpC_Tuple_GetItem(IntPtr list, int index);
+
         [DllImport("embed-python-lib.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "?EpC_CoDict@@YAPEAU_object@@XZ")]
         private extern static IntPtr EpC_CoDict();
         [DllImport("embed-python-lib.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "?EpC_Dict_SetItemString@@YAHPEAU_object@@PEBD0@Z")]
@@ -47,27 +61,17 @@ namespace EmbPython
 
         [DllImport("embed-python-lib.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "?EpC_AsChar@@YAPEBDPEAU_object@@@Z")]
         private extern static IntPtr EpC_AsChar(IntPtr pyobj);
+        [DllImport("embed-python-lib.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "?EpC_AsInt@@YAHPEAU_object@@@Z")]
+        private extern static int EpC_AsInt(IntPtr pyobj);
+        [DllImport("embed-python-lib.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "?EpC_NumpyArrayAsDoubleArray@@YAPEBNPEAU_object@@H@Z")]
+        private extern static IntPtr EpC_NumpyArrayAsDoubleArray(IntPtr ndarray, int depth);
 
         const bool DEBUG = false;
-
-        public class Context : System.IDisposable
-        {
-            public Context()
-            {
-                EpC_Initialize();
-            }
-            ~Context()
-            {
-                EpC_Finalize();
-            }
-            public void Dispose()
-            {
-            }
-        }
 
         public static void Initialize()
         {
             EpC_Initialize();
+            EpC_NumpyInitialize();
         }
 
         public static int Finalize()
@@ -175,7 +179,7 @@ namespace EmbPython
             return ref_flag;
         }
 
-        public class Object
+        public class Object : DynamicObject
         {
             private static dynamic np = new Module();
             private IntPtr pyobject;
@@ -205,6 +209,15 @@ namespace EmbPython
                     np = Import("numpy");
                 }
                 return np.prod( new List<dynamic> {  lhs, rhs }, new { axis=0 } );
+            }
+            public override bool TryGetMember(
+                  GetMemberBinder binder, out object result)
+            {
+                string name = binder.Name;
+                // Console.WriteLine("TryGetMember: " + name);
+                IntPtr attr_ptr = EpC_GetAttrString(pyobject, name.ToCharArray());
+                result = new Object(attr_ptr);
+                return true;
             }
         }
 
@@ -299,6 +312,59 @@ namespace EmbPython
             Function f = new Function(func_ptr);
 
             return f.call;
+        }
+
+        public class Image : DynamicObject
+        {
+            private int width;
+            private int height;
+            private double[] data;
+
+            public Image()
+            {
+                width = 0;
+                height = 0;
+                data = new double[0];
+            }
+            ~Image()
+            {
+                //
+            }
+            public Image(dynamic ndarray)
+            {
+                IntPtr shape = ndarray.shape.getPyObject();
+                width = EpC_AsInt( EpC_Tuple_GetItem(shape, 0) );
+                height = EpC_AsInt(EpC_Tuple_GetItem(shape, 1));
+                IntPtr pdata = EpC_NumpyArrayAsDoubleArray(ndarray.getPyObject(), 2);
+                int size = width * height;
+                Console.Write( "Image: size={0}\n", size);
+                data = new double[size];
+                Marshal.Copy(pdata, data, 0, size);
+            }
+            public Tuple<int, int> shape()
+            {
+                return new Tuple<int, int>(width, height);
+            }
+            public override string ToString()
+            {
+                StringWriter writer = new StringWriter();
+                writer.Write("[\n");
+                for (int i = 0; i < height; ++i)
+                {
+                    writer.Write( "  [" );
+                    for (int j = 0; j < width; ++j)
+                    {
+                        if ( j> 0 )
+                        {
+                            writer.Write(" ");
+                        }
+                        writer.Write("{0}", data[width*i + j]);
+                    }
+                    writer.Write("]\n");
+                }
+                writer.Write("]\n");
+                return writer.ToString();
+            }
         }
     }
 }

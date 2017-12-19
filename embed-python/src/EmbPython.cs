@@ -28,6 +28,9 @@ namespace EmbPython
         [DllImport("embed-python-lib.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "?EpC_GetAttrString@@YAPEAU_object@@PEAU1@PEBD@Z")]
         private extern static IntPtr EpC_GetAttrString(IntPtr pyobj, char[] name);
 
+        [DllImport("embed-python-lib.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "?EpC_DECREF@@YAXPEAU_object@@@Z")]
+        private extern static void EpC_DECREF(IntPtr pyobj);
+
         [DllImport("embed-python-lib.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "?EpC_CoString@@YAPEAU_object@@PEBD@Z")]
         private extern static IntPtr EpC_CoString(char[] path);
         [DllImport("embed-python-lib.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "?EpC_CoInt@@YAPEAU_object@@H@Z")]
@@ -67,16 +70,20 @@ namespace EmbPython
         private extern static IntPtr EpC_NumpyArrayAsDoubleArray(IntPtr ndarray, int depth);
 
         const bool DEBUG = false;
+        private static bool EpC_isOpen = false;
 
         public static void Initialize()
         {
             EpC_Initialize();
             EpC_NumpyInitialize();
+            EpC_isOpen = true;
         }
 
         public static int Finalize()
         {
-            return EpC_Finalize();
+            int ret = EpC_Finalize();
+            EpC_isOpen = false;
+            return ret;
         }
 
         public static void AddSysPath(String path)
@@ -183,16 +190,16 @@ namespace EmbPython
         {
             private static dynamic np = new Module();
             private IntPtr pyobject;
-            public Object()
-            {
-                pyobject = (IntPtr)0;
-            }
             public Object( IntPtr object_ptr )
             {
                 pyobject = object_ptr;
             }
-            public Object(String arg)
+            ~Object()
             {
+                if (EpC_isOpen)
+                {
+                    EpC_DECREF(pyobject);
+                }
             }
             public override String ToString()
             {
@@ -229,7 +236,13 @@ namespace EmbPython
             {
                 pyobject = func_ptr;
             }
-
+            ~Function()
+            {
+                if (EpC_isOpen)
+                {
+                    EpC_DECREF(pyobject);
+                }
+            }
             public Object call(params dynamic[] args)
             {
                 // Console.WriteLine("Function.call");
@@ -280,6 +293,13 @@ namespace EmbPython
             public Module(IntPtr object_ptr)
             {
                 pyobject = object_ptr;
+            }
+            ~Module()
+            {
+                if (EpC_isOpen && isOk())
+                {
+                    EpC_DECREF(pyobject);
+                }
             }
             public override bool TryGetMember(
                   GetMemberBinder binder, out object result)

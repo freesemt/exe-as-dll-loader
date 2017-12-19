@@ -28,5 +28,8 @@ int test_9()
 		EpC_Print(EpC_Tuple_GetItem(tuple, i), 0);
 	}
 
+	EpC_DECREF(list);
+	EpC_DECREF(tuple);
+
 	return 0;
 }

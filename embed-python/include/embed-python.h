@@ -29,6 +29,10 @@ EMBEDPYTHONLIB_API EpC_Object EpC_CoFloat(const double float_value);
 EMBEDPYTHONLIB_API EpC_Object EpC_CoNone();
 EMBEDPYTHONLIB_API EpC_Object EpC_CoList(const int num_items);
 EMBEDPYTHONLIB_API int EpC_List_SetItem(EpC_Object list, int index, EpC_Object item);
+EMBEDPYTHONLIB_API EpC_Object EpC_List_GetItem(EpC_Object list, int index);
+EMBEDPYTHONLIB_API EpC_Object EpC_CoTuple(const int num_items);
+EMBEDPYTHONLIB_API int EpC_Tuple_SetItem(EpC_Object tuple, int index, EpC_Object item);
+EMBEDPYTHONLIB_API EpC_Object EpC_Tuple_GetItem(EpC_Object tuple, int index);
 EMBEDPYTHONLIB_API EpC_Object EpC_CoDict();
 EMBEDPYTHONLIB_API int EpC_Dict_SetItemString(EpC_Object dict, const char* key, EpC_Object value);
 
@@ -42,6 +46,9 @@ EMBEDPYTHONLIB_API EpC_Object EpC_CallK(EpC_Function func, const int n, EpC_Obje
 EMBEDPYTHONLIB_API void EpC_Print(EpC_Object arg1, ...);
 
 EMBEDPYTHONLIB_API const char* EpC_TypeAsChar(EpC_Object object);
+
+EMBEDPYTHONLIB_API const int EpC_NumpyInitialize();
+EMBEDPYTHONLIB_API const double* EpC_NumpyArrayAsDoubleArray(EpC_Object object, int size);
 
 /*
  *	C++ interface

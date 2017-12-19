@@ -6,6 +6,8 @@
 #include "test-5.h"
 #include "test-6.h"
 #include "test-7.h"
+#include "test-8.h"
+#include "test-9.h"
 
 int main()
 {
@@ -22,6 +24,8 @@ int main()
 	test_5();
 	test_6();
 	test_7();
+	test_8();
+	test_9();
 
 	EpC_Finalize();
 	return 0;

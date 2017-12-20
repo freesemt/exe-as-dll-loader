@@ -5,6 +5,8 @@ using System.Dynamic;
 using System.Reflection;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Runtime.ExceptionServices;
+using System.Security;
 
 namespace EmbPython
 {
@@ -186,6 +188,23 @@ namespace EmbPython
             return ref_flag;
         }
 
+        [HandleProcessCorruptedStateExceptions]
+        [SecurityCritical]
+        private static int Try_DECREF( IntPtr pyobj )
+        {
+            try
+            {
+                EpC_DECREF(pyobj); 
+            }
+            catch (Exception e)
+            {
+                System.Console.WriteLine(e.Message);
+                return 1;
+            }
+
+            return 0;
+        }
+
         public class Object : DynamicObject
         {
             private static dynamic np = new Module();
@@ -198,7 +217,8 @@ namespace EmbPython
             {
                 if (EpC_isOpen)
                 {
-                    EpC_DECREF(pyobject);
+                    // we can't catch an exception here because this call causes an error later in Finalize()
+                    // Try_DECREF(pyobject);    
                 }
             }
             public override String ToString()

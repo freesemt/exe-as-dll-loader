@@ -73,6 +73,16 @@ namespace embpython_test
             Ep.Image image_ = new Ep.Image(image.data);
             Console.WriteLine(image_.shape().ToString());
             Console.WriteLine(image_.ToString());
+            image_[0, 0] = 0;
+            image_[0, 1] = 1;
+            image_[1, 0] = 1;
+            image_[1, 1] = 0;
+            Console.WriteLine(image_.ToString());
+            dynamic new_ndarray = image_.makeNdArray();
+            Console.WriteLine(new_ndarray.ToString());
+            image.data = new_ndarray;
+            plt.imshow(image.data);
+            plt.show();
         }
 
         static void Main(string[] args)

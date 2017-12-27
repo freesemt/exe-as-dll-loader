@@ -22,6 +22,7 @@ EMBEDPYTHONLIB_API EpC_Function EpC_FromImport(const char* package, const char* 
 EMBEDPYTHONLIB_API EpC_Module EpC_Import(const char* package);
 EMBEDPYTHONLIB_API EpC_Function EpC_GetMethod(EpC_Module module, const char* name);
 EMBEDPYTHONLIB_API EpC_Object EpC_GetAttrString(EpC_Object object, const char* name);
+EMBEDPYTHONLIB_API int EpC_SetAttrString(EpC_Object object, const char* name, EpC_Object value);
 
 EMBEDPYTHONLIB_API void EpC_DECREF(EpC_Object object);
 
@@ -50,7 +51,8 @@ EMBEDPYTHONLIB_API void EpC_Print(EpC_Object arg1, ...);
 EMBEDPYTHONLIB_API const char* EpC_TypeAsChar(EpC_Object object);
 
 EMBEDPYTHONLIB_API const int EpC_NumpyInitialize();
-EMBEDPYTHONLIB_API const double* EpC_NumpyArrayAsDoubleArray(EpC_Object object, int size);
+EMBEDPYTHONLIB_API const double* EpC_NumpyArrayAsDoubleArray(EpC_Object object, int depth);
+EMBEDPYTHONLIB_API EpC_Object EpC_CoDoubleNumpyArray(int nd, int* dims, const double* data);
 
 /*
  *	C++ interface

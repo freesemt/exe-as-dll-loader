@@ -110,6 +110,11 @@ EMBEDPYTHONLIB_API EpC_Object EpC_GetAttrString(EpC_Object object, const char* n
 	return attr;
 }
 
+EMBEDPYTHONLIB_API int EpC_SetAttrString(EpC_Object object, const char* name, EpC_Object value)
+{
+	return PyObject_SetAttrString(object, name, value);
+}
+
 EMBEDPYTHONLIB_API void EpC_DECREF(EpC_Object object)
 {
 	Py_DECREF(object);
@@ -209,6 +214,13 @@ EMBEDPYTHONLIB_API const double* EpC_NumpyArrayAsDoubleArray(EpC_Object object, 
 	double ** in_dataptr = (double **)NpyIter_GetDataPtrArray(in_iter);
 	// printf("in_dataptr=%p\n", in_dataptr);
 	return *in_dataptr;
+}
+
+EMBEDPYTHONLIB_API EpC_Object EpC_CoDoubleNumpyArray(int nd, int* dims, const double* data)
+{
+	npy_intp dims_[2] = { dims[0], dims[1] };
+	PyObject* pyobject = PyArray_SimpleNewFromData(nd, dims_, PyArray_DOUBLE, (void*)data);
+	return pyobject;
 }
 
 EMBEDPYTHONLIB_API int EpC_AsInt(EpC_Object object)

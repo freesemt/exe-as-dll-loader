@@ -16,5 +16,14 @@ int test_8()
 	{
 		printf("darray[%d]=%g\n", i, darray[i]);
 	}
+
+	int dims[] = { 2, 1 };
+	EpC_Object nd_array_copy = EpC_CoDoubleNumpyArray( 2, dims, darray);
+	EpC_Print(nd_array_copy, 0);
+
+	const double another_data[] = { 0, 1, 1, 0 };
+	int dims2[] = { 2, 2 };
+	EpC_Object another_nd_array = EpC_CoDoubleNumpyArray( 2, dims2, another_data );
+	EpC_Print(another_nd_array, 0);
 	return 0;
 }

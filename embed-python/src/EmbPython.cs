@@ -29,6 +29,8 @@ namespace EmbPython
         private extern static IntPtr EpC_GetMethod(IntPtr module, char[] method);
         [DllImport("embed-python-lib.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "?EpC_GetAttrString@@YAPEAU_object@@PEAU1@PEBD@Z")]
         private extern static IntPtr EpC_GetAttrString(IntPtr pyobj, char[] name);
+        [DllImport("embed-python-lib.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "?EpC_SetAttrString@@YAHPEAU_object@@PEBD0@Z")]
+        private extern static int EpC_SetAttrString(IntPtr pyobj, char[] name, IntPtr value);
 
         [DllImport("embed-python-lib.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "?EpC_DECREF@@YAXPEAU_object@@@Z")]
         private extern static void EpC_DECREF(IntPtr pyobj);
@@ -70,6 +72,8 @@ namespace EmbPython
         private extern static int EpC_AsInt(IntPtr pyobj);
         [DllImport("embed-python-lib.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "?EpC_NumpyArrayAsDoubleArray@@YAPEBNPEAU_object@@H@Z")]
         private extern static IntPtr EpC_NumpyArrayAsDoubleArray(IntPtr ndarray, int depth);
+        [DllImport("embed-python-lib.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "?EpC_CoDoubleNumpyArray@@YAPEAU_object@@HPEAHPEBN@Z")]
+        private extern static IntPtr EpC_CoDoubleNumpyArray(int nd, IntPtr dims,IntPtr data);
 
         const bool DEBUG = false;
         private static bool EpC_isOpen = false;
@@ -209,9 +213,10 @@ namespace EmbPython
         {
             private static dynamic np = new Module();
             private IntPtr pyobject;
+  
             public Object( IntPtr object_ptr )
             {
-                pyobject = object_ptr;
+                this.pyobject = object_ptr;
             }
             ~Object()
             {
@@ -240,10 +245,15 @@ namespace EmbPython
             public override bool TryGetMember(
                   GetMemberBinder binder, out object result)
             {
-                string name = binder.Name;
-                // Console.WriteLine("TryGetMember: " + name);
-                IntPtr attr_ptr = EpC_GetAttrString(pyobject, name.ToCharArray());
+                IntPtr attr_ptr = EpC_GetAttrString(pyobject, binder.Name.ToCharArray());
                 result = new Object(attr_ptr);
+                return true;
+            }
+            public override bool TrySetMember(
+                SetMemberBinder binder, object value)
+            {
+                dynamic value_ = value;
+                EpC_SetAttrString( this.pyobject, binder.Name.ToCharArray(), value_.getPyObject() );
                 return true;
             }
         }
@@ -385,6 +395,11 @@ namespace EmbPython
             {
                 return new Tuple<int, int>(width, height);
             }
+            public double this[int i, int j]
+            {
+                set { this.data[i * width + j] = value; }
+                get { return this.data[i * width + j]; }
+            }
             public override string ToString()
             {
                 StringWriter writer = new StringWriter();
@@ -404,6 +419,21 @@ namespace EmbPython
                 }
                 writer.Write("]\n");
                 return writer.ToString();
+            }
+            public Object makeNdArray()
+            {
+                // copy dims to unmanaged area
+                int[] dims = { width, height };
+                int dims_size = Marshal.SizeOf(dims[0]) * dims.Length;
+                IntPtr dims_ = Marshal.AllocHGlobal(dims_size);
+                Marshal.Copy(dims, 0, dims_, dims.Length);
+
+                // copoy data to unmanaged area
+                int data_size = Marshal.SizeOf(data[0]) * data.Length;
+                IntPtr data_ = Marshal.AllocHGlobal(data_size);
+                Marshal.Copy(data, 0, data_, data.Length);
+                IntPtr pyobject = EpC_CoDoubleNumpyArray(2, dims_, data_);
+                return new Object(pyobject);
             }
         }
     }
